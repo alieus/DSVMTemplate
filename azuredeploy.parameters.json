@@ -1,12 +1,30 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "_artifactsLocation": {
+            "value": ""
+        },
+        "_artifactsLocationSasToken": {
+            "value": ""
+        },
+        "vmName": {
+            "value": "VM"
+        },
+        "vmSize": {
+            "value": "Standard_D2_v3"
+        },
         "adminUsername": {
-            "value": "GEN-UNIQUE"
+            "value": ""
+        },
+        "location": {
+            "value": "[resourceGroup().location]"
+        },
+        "authenticationType": {
+            "value": "sshPublicKey"
         },
         "adminPasswordOrKey": {
-            "value": "GEN-PASSWORD"
+            "value": ""
         }
     }
 }
