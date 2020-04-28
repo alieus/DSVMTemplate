@@ -1,269 +1,318 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-      "_artifactsLocation": {
-        "type": "string",
-        "metadata": {
-          "description": "The base URI where artifacts required by this template are located."
+        "vmName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "VM Name"
+            }
         },
-        "defaultValue": ""
-      },
-      "_artifactsLocationSasToken": {
-        "type": "securestring",
-        "metadata": {
-          "description": "The sasToken required to access _artifactsLocation when they're located in a storage account with private access."
+        "artifactsLocation": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The location and sasToken of the artifact."
+            },
+            "defaultValue": ""
         },
-        "defaultValue": ""
-      },
-      "vmName": {
-        "type": "string",
-        "defaultValue": "VM",
-        "metadata": {
-          "description": "VM Name"
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_D1_v2",
+            "allowedValues": [
+                "Basic_A3",
+                "Standard_A4",
+                "Standard_A5",
+                "Standard_A6",
+                "Standard_A7",
+                "Standard_A8",
+                "Standard_A9",
+                "Standard_A10",
+                "Standard_A11",
+                "Standard_D1_v2",
+                "Standard_D3_v2",
+                "Standard_D4_v2",
+                "Standard_D12_v2",
+                "Standard_D13_v2",
+                "Standard_D14_v2"
+            ],
+            "metadata": {
+                "description": "Size for the Virtual Machine."
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Administrator name"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
+        },
+        "authenticationType": {
+            "type": "string",
+            "defaultValue": "sshPublicKey",
+            "allowedValues": [
+                "sshPublicKey",
+                "password"
+            ],
+            "metadata": {
+                "description": "Type of authentication to use on the Virtual Machine. SSH key is recommended."
+            }
+        },
+        "adminPasswordOrKey": {
+            "type": "securestring",
+            "metadata": {
+                "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
+            }
         }
-      },
-      "vmSize": {
-        "type": "string",
-        "defaultValue": "Standard_D2_v3",
-        "metadata": {
-          "description": "VM Size"
-        }
-      },
-      "adminUsername": {
-        "type": "string",
-        "metadata": {
-          "description": "Administrator name"
-        }
-      },
-      "location": {
-        "type": "string",
-        "defaultValue": "[resourceGroup().location]",
-        "metadata": {
-          "description": "Location for all resources."
-        }
-      },
-      "authenticationType": {
-        "type": "string",
-        "defaultValue": "sshPublicKey",
-        "allowedValues": [
-          "sshPublicKey",
-          "password"
-        ],
-        "metadata": {
-          "description": "Type of authentication to use on the Virtual Machine. SSH key is recommended."
-        }
-      },
-      "adminPasswordOrKey": {
-        "type": "securestring",
-        "metadata": {
-          "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
-        }
-      }
     },
     "variables": {
-      "vnetName": "attritionVnet",
-      "vNetAddressSpace": "10.0.0.0/16",
-      "subnetName": "attritionSubnet01",
-      "subnetAdressPrefix": "10.0.0.0/24",
-      "subnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets',variables('vnetName'),variables('subnetName'))]",
-      "asgName": "attritionAsg",
-      "asgId": "[resourceId('Microsoft.Network/applicationSecurityGroups',variables('asgName'))]",
-      "nsgName": "attritionNsg",
-      "nsgId": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('nsgName'))]",
-      "pipName": "attritionPip",
-      "pipId": "[resourceId('Microsoft.Network/publicIPAddresses',variables('pipName'))]",
-      "imageInfo": {
-        "publisher": "microsoft-dsvm",
-        "offer": "linux-data-science-vm-ubuntu",
-        "sku": "linuxdsvmubuntu",
-        "version": "latest"
-      },
-      "vmStorageType": "Standard_LRS",
-      "scriptUrl": "[uri(parameters('_artifactsLocation'), concat('orchestrate.sh', parameters('_artifactsLocationSasToken')))]",
-      "linuxConfiguration": {
-        "disablePasswordAuthentication": true,
-        "ssh": {
-          "publicKeys": [
-            {
-              "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
-              "keyData": "[parameters('adminPasswordOrKey')]"
+        "vnetName": "[concat(parameters('vmName'),'-Vnet')]",
+        "vNetAddressSpace": "10.0.0.0/16",
+        "subnetName": "[concat(parameters('vmName'),'-Subnet')]",
+        "subnetAdressPrefix": "10.0.0.0/24",
+        "subnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets',variables('vnetName'),variables('subnetName'))]",
+        "asgName": "[concat(parameters('vmName'),'-Asg')]",
+        "storageAccountName": "avadevitsmlstorage",
+        "asgId": "[resourceId('Microsoft.Network/applicationSecurityGroups',variables('asgName'))]",
+        "nsgName": "[concat(parameters('vmName'),'-Nsg')]",
+        "nsgId": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('nsgName'))]",
+        "pipName": "[concat(parameters('vmName'),'-Ip')]",
+        "pipId": "[resourceId('Microsoft.Network/publicIPAddresses',variables('pipName'))]",
+        "imageInfo": {
+            "publisher": "microsoft-dsvm",
+            "offer": "linux-data-science-vm-ubuntu",
+            "sku": "linuxdsvmubuntu",
+            "version": "latest"
+        },
+        "vmStorageType": "Standard_LRS",
+        "linuxConfiguration": {
+            "disablePasswordAuthentication": true,
+            "ssh": {
+                "publicKeys": [
+                    {
+                        "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                        "keyData": "[parameters('adminPasswordOrKey')]"
+                    }
+                ]
             }
-          ]
         }
-      }
     },
     "resources": [
-      {
-        "comments": "Application Security Group",
-        "name": "[variables('asgName')]",
-        "type": "Microsoft.Network/applicationSecurityGroups",
-        "apiVersion": "2019-11-01",
-        "location": "[parameters('location')]",
-        "properties": {}
-      },
-      {
-        "comments": "Network Security Group",
-        "name": "[variables('nsgName')]",
-        "type": "Microsoft.Network/networkSecurityGroups",
-        "apiVersion": "2019-11-01",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[variables('asgName')]"
-        ],
-        "properties": {
-          "securityRules": [
-            {
-              "name": "AllowSshAll",
-              "properties": {
-                "description": "Allow SSH traffic to web servers",
-                "sourceAddressPrefix": "*",
-                "sourcePortRange": "*",
-                "direction": "Inbound",
-                "access": "Allow",
-                "priority": 200,
-                "protocol": "Tcp",
-                "destinationPortRange": "22",
-                "destinationApplicationSecurityGroups": [
-                  {
-                    "id": "[variables('asgId')]"
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      },
-      {
-        "comments": "Virtual Network",
-        "name": "[variables('vNetName')]",
-        "type": "Microsoft.Network/virtualNetworks",
-        "apiVersion": "2019-11-01",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[variables('nsgName')]"
-        ],
-        "properties": {
-          "addressSpace": {
-            "addressPrefixes": [
-              "[variables('vNetAddressSpace')]"
-            ]
-          },
-          "subnets": [
-            {
-              "name": "[variables('subnetName')]",
-              "properties": {
-                "addressPrefix": "[variables('subnetAdressPrefix')]",
-                "networkSecurityGroup": {
-                  "id": "[variables('nsgId')]"
-                }
-              }
-            }
-          ]
-        }
-      },
-      {
-        "comments": "Public Ip Address",
-        "name": "[variables('pipName')]",
-        "type": "Microsoft.Network/publicIPAddresses",
-        "apiVersion": "2019-11-01",
-        "location": "[parameters('location')]",
-        "properties": {
-          "publicIPAllocationMethod": "Dynamic"
-        }
-      },
-      {
-        "comments": "Web Server Network Interface",
-        "name": "[concat(parameters('vmName'),'-NIC')]",
-        "type": "Microsoft.Network/networkInterfaces",
-        "location": "[parameters('location')]",
-        "apiVersion": "2019-11-01",
-        "dependsOn": [
-          "[variables('vNetName')]",
-          "[variables('pipName')]"
-        ],
-        "properties": {
-          "ipConfigurations": [
-            {
-              "name": "ipconfig1",
-              "properties": {
-                "privateIPAllocationMethod": "Dynamic",
-                "publicIPAddress": {
-                  "id": "[variables('pipId')]"
-                },
-                "subnet": {
-                  "id": "[variables('subnetId')]"
-                },
-                "applicationSecurityGroups": [
-                  {
-                    "id": "[variables('asgId')]"
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      },
-      {
-        "comments": "Linux Web Server",
-        "name": "[parameters('vmName')]",
-        "type": "Microsoft.Compute/virtualMachines",
-        "apiVersion": "2019-12-01",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[concat(parameters('vmName'),'-NIC')]"
-        ],
-        "properties": {
-          "hardwareProfile": {
-            "vmSize": "[parameters('vmSize')]"
-          },
-          "osProfile": {
-            "computerName": "[parameters('vmName')]",
-            "adminUsername": "[parameters('adminUsername')]",
-            "adminPassword": "[parameters('adminPasswordOrKey')]",
-            "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
-          },
-          "storageProfile": {
-            "imageReference": "[variables('imageInfo')]",
-            "osDisk": {
-              "name": "[concat(parameters('vmName'),'-osdisk')]",
-              "caching": "ReadWrite",
-              "createOption": "FromImage",
-              "managedDisk": {
-                "storageAccountType": "[variables('vmStorageType')]"
-              }
-            }
-          },
-          "networkProfile": {
-            "networkInterfaces": [
-              {
-                "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('vmName'),'-NIC'))]"
-              }
-            ]
-          }
-        }
-      },
-      {
-        "comments": "Installs dependencies",
-        "type": "Microsoft.Compute/virtualMachines/extensions",
-        "name": "[concat(parameters('vmName'),'/linuxconfig')]",
-        "apiVersion": "2019-12-01",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-          "[parameters('vmName')]"
-        ],
-        "properties": {
-          "publisher": "Microsoft.Azure.Extensions",
-          "type": "CustomScript",
-          "typeHandlerVersion": "2.0",
-          "autoUpgradeMinorVersion": true,
-          "settings": {
-            "fileUris": [
-              "[variables('scriptUrl')]"
+        {
+            "comments": "Application Security Group",
+            "name": "[variables('asgName')]",
+            "type": "Microsoft.Network/applicationSecurityGroups",
+            "apiVersion": "2019-11-01",
+            "location": "[parameters('location')]",
+            "properties": {}
+        },
+        {
+            "comments": "Network Security Group",
+            "name": "[variables('nsgName')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2019-11-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('asgName')]"
             ],
-            "commandToExecute": "sh orchestrate.sh"
-          }
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "AllowHttpAll",
+                        "properties": {
+                            "description": "Allow http traffic to web servers",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "direction": "Inbound",
+                            "access": "Allow",
+                            "priority": 100,
+                            "protocol": "Tcp",
+                            "destinationPortRange": "80",
+                            "destinationApplicationSecurityGroups": [
+                                {
+                                    "id": "[variables('asgId')]"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "AllowSshAll",
+                        "properties": {
+                            "description": "Allow SSH traffic to web servers",
+                            "sourceAddressPrefix": "*",
+                            "sourcePortRange": "*",
+                            "direction": "Inbound",
+                            "access": "Allow",
+                            "priority": 200,
+                            "protocol": "Tcp",
+                            "destinationPortRange": "22",
+                            "destinationApplicationSecurityGroups": [
+                                {
+                                    "id": "[variables('asgId')]"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "comments": "Virtual Network",
+            "name": "[variables('vNetName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2019-11-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('nsgName')]"
+            ],
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('vNetAddressSpace')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnetAdressPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[variables('nsgId')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "comments": "Public Ip Address",
+            "name": "[variables('pipName')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2019-11-01",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "Static"
+            }
+        },
+        {
+            "comments": "Web Server Network Interface",
+            "name": "[concat(parameters('vmName'),'-NIC')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "location": "[parameters('location')]",
+            "apiVersion": "2019-11-01",
+            "dependsOn": [
+                "[variables('vNetName')]",
+                "[variables('pipName')]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[variables('pipId')]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnetId')]"
+                            },
+                            "applicationSecurityGroups": [
+                                {
+                                    "id": "[variables('asgId')]"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "comments": "Linux DSVM",
+            "name": "[parameters('vmName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2019-12-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat(parameters('vmName'),'-NIC')]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPasswordOrKey')]",
+                    "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
+                },
+                "storageProfile": {
+                    "imageReference": "[variables('imageInfo')]",
+                    "osDisk": {
+                        "osType": "Linux",
+                        "name": "[concat(parameters('vmName'),'-osdisk')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "storageAccountType": "[variables('vmStorageType')]"
+                        }
+                    },
+                    "dataDisks": [
+                        {
+                            "lun": 0,
+                            "name": "[concat(parameters('vmName'),'-datadisk')]",
+                            "createOption": "FromImage",
+                            "caching": "ReadOnly"
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('vmName'),'-NIC'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": "true",
+                        "storageUri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net')]"
+                    }
+                }
+            }
+        },
+        {
+            "comments": "Installs dependencies",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('vmName'),'/extension')]",
+            "apiVersion": "2019-12-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[parameters('vmName')]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "protectedSettings": {
+                    "fileUris": [
+                        "[parameters('artifactsLocation')]"
+                    ],
+                    "commandToExecute": "sudo sh orchestrate.sh"
+                }
+            }
         }
-      }
-    ]
-  }
+    ],
+    "outputs": {
+        "Public IP SSH": {
+            "value": "[concat(reference(resourceId('Microsoft.Compute/virtualMachines',parameters('vmName'))).osProfile.adminUsername, '@',reference(resourceId('Microsoft.Network/publicIPAddresses',variables('pipName'))).IpAddress)]",
+            "type": "string"
+        }
+    }
+}
