@@ -78,7 +78,6 @@
         "subnetAdressPrefix": "10.0.0.0/24",
         "subnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets',variables('vnetName'),variables('subnetName'))]",
         "asgName": "[concat(parameters('vmName'),'-Asg')]",
-        "storageAccountName": "avadevitsmlstorage",
         "asgId": "[resourceId('Microsoft.Network/applicationSecurityGroups',variables('asgName'))]",
         "nsgName": "[concat(parameters('vmName'),'-Nsg')]",
         "nsgId": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('nsgName'))]",
@@ -279,10 +278,6 @@
                     ]
                 },
                 "diagnosticsProfile": {
-                    "bootDiagnostics": {
-                        "enabled": "true",
-                        "storageUri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net')]"
-                    }
                 }
             }
         },
