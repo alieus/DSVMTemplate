@@ -1,0 +1,9 @@
+
+
+{
+  "itemDisplayName": "Azure Data Science VM",
+  "description": "This template allows you to create a Linux Data Science Virtual Machine along with all the resources needed.",
+  "summary": "Deploy a Linux DSVM",
+  "githubUsername": "alieus",
+  "dateUpdated": "2020-04-28"
+}
