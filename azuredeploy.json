@@ -299,7 +299,7 @@
                     "fileUris": [
                         "[parameters('artifactsLocation')]"
                     ],
-                    "commandToExecute": "sudo sh orchestrate.sh"
+                    "commandToExecute": "sudo sh setup.sh"
                 }
             }
         }
