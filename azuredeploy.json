@@ -9,13 +9,6 @@
                 "description": "VM Name"
             }
         },
-        "artifactsLocation": {
-            "type": "securestring",
-            "metadata": {
-                "description": "The location and sasToken of the artifact."
-            },
-            "defaultValue": ""
-        },
         "vmSize": {
             "type": "string",
             "defaultValue": "Standard_D1_v2",
@@ -40,18 +33,39 @@
                 "description": "Size for the Virtual Machine."
             }
         },
-        "adminUsername": {
-            "type": "string",
-            "metadata": {
-                "description": "Administrator name"
-            }
-        },
         "location": {
             "type": "string",
             "defaultValue": "[resourceGroup().location]",
             "metadata": {
                 "description": "Location for all resources."
             }
+        },
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Administrator name"
+            }
+        },
+        "StorageAccountName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Name of the storage account for the container to be mounted"
+            }
+        },
+        "PatToken": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Your Personal access token for cloning repos."
+            },
+            "defaultValue": ""
+        },
+        "artifactsLocation": {
+            "type": "string",
+            "metadata": {
+                "description": "The location and of the artifact."
+            },
+            "defaultValue": ""
         },
         "authenticationType": {
             "type": "string",
@@ -74,6 +88,7 @@
     "variables": {
         "vnetName": "[concat(parameters('vmName'),'-Vnet')]",
         "vNetAddressSpace": "10.0.0.0/16",
+        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
         "subnetName": "[concat(parameters('vmName'),'-Subnet')]",
         "subnetAdressPrefix": "10.0.0.0/24",
         "subnetId": "[resourceId('Microsoft.Network/virtualNetworks/subnets',variables('vnetName'),variables('subnetName'))]",
@@ -299,7 +314,9 @@
                     "fileUris": [
                         "[parameters('artifactsLocation')]"
                     ],
-                    "commandToExecute": "sudo sh setup.sh"
+                    "commandToExecute": "[concat('sudo sh setup.sh', ' ', listKeys(variables('storageAccountId'), '2019-04-01').keys[0].value, ' ', parameters('PatToken'))]",
+                    "storageAccountName": "[parameters('StorageAccountName')]",
+                    "storageAccountKey": "[listKeys(variables('storageAccountId'), '2019-04-01').keys[0].value]"
                 }
             }
         }
