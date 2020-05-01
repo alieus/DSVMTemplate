@@ -5,17 +5,23 @@
         "vmName": {
             "value": ""
         },
-        "artifactsLocation": {
-            "value": ""
-        },
         "vmSize": {
             "value": "Standard_D1_v2"
+        },
+        "location": {
+            "value": "[resourceGroup().location]"
         },
         "adminUsername": {
             "value": ""
         },
-        "location": {
-            "value": "[resourceGroup().location]"
+        "StorageAccountName": {
+            "value": ""
+        },
+        "PatToken": {
+            "value": ""
+        },
+        "artifactsLocation": {
+            "value": ""
         },
         "authenticationType": {
             "value": "sshPublicKey"
