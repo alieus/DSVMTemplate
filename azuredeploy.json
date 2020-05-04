@@ -56,7 +56,7 @@
         "PatToken": {
             "type": "securestring",
             "metadata": {
-                "description": "Your Personal access token for cloning repos."
+                "description": "Your personal access token for cloning repos."
             },
             "defaultValue": ""
         },
@@ -314,7 +314,7 @@
                     "fileUris": [
                         "[parameters('artifactsLocation')]"
                     ],
-                    "commandToExecute": "[concat('sudo sh setup.sh', ' ', listKeys(variables('storageAccountId'), '2019-04-01').keys[0].value, ' ', parameters('PatToken'))]",
+                    "commandToExecute": "[concat('sudo sh setup.sh', ' ', listKeys(variables('storageAccountId'), '2019-04-01').keys[0].value, ' ', parameters('PatToken'), ' ', parameters('StorageAccountName'))]",
                     "storageAccountName": "[parameters('StorageAccountName')]",
                     "storageAccountKey": "[listKeys(variables('storageAccountId'), '2019-04-01').keys[0].value]"
                 }
