@@ -314,7 +314,7 @@
                     "fileUris": [
                         "[parameters('artifactsLocation')]"
                     ],
-                    "commandToExecute": "[concat('sudo sh setup.sh', ' ', listKeys(variables('storageAccountId'), '2019-04-01').keys[0].value, ' ', parameters('PatToken'), ' ', parameters('StorageAccountName'))]",
+                    "commandToExecute": "[concat('sudo sh setup.sh', ' ', listKeys(variables('storageAccountId'), '2019-04-01').keys[0].value, ' ', parameters('PatToken'), ' ', parameters('StorageAccountName'), ' ', reference(resourceId('Microsoft.Compute/virtualMachines',parameters('vmName'))).osProfile.adminUsername)]",
                     "storageAccountName": "[parameters('StorageAccountName')]",
                     "storageAccountKey": "[listKeys(variables('storageAccountId'), '2019-04-01').keys[0].value]"
                 }
