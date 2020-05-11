@@ -60,6 +60,13 @@
             },
             "defaultValue": ""
         },
+        "SasToken": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Provided Sas Token for mounting the contianers."
+            },
+            "defaultValue": ""
+        },
         "artifactsLocation": {
             "type": "string",
             "metadata": {
@@ -314,7 +321,7 @@
                     "fileUris": [
                         "[parameters('artifactsLocation')]"
                     ],
-                    "commandToExecute": "[concat('sudo sh setup.sh', ' ', listKeys(variables('storageAccountId'), '2019-04-01').keys[0].value, ' ', parameters('PatToken'), ' ', parameters('StorageAccountName'))]",
+                    "commandToExecute": "[concat('sudo sh setup.sh', ' ', parameters('SasToken'),' ', parameters('PatToken'), ' ', parameters('StorageAccountName'))]",
                     "storageAccountName": "[parameters('StorageAccountName')]",
                     "storageAccountKey": "[listKeys(variables('storageAccountId'), '2019-04-01').keys[0].value]"
                 }
