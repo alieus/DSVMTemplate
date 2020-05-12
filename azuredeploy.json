@@ -321,7 +321,7 @@
                     "fileUris": [
                         "[parameters('artifactsLocation')]"
                     ],
-                    "commandToExecute": "[concat('sudo sh setup.sh', ' ', parameters('StorageAccountName'), ' ', parameters('PatToken'), ' ', parameters('SasToken'))]",
+                    "commandToExecute": "[concat('sudo sh setup.sh', ' ', parameters('StorageAccountName'), ' ', parameters('PatToken'))]",
                     "storageAccountName": "[parameters('StorageAccountName')]",
                     "storageAccountKey": "[listKeys(variables('storageAccountId'), '2019-04-01').keys[0].value]"
                 }
