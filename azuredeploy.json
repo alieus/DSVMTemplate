@@ -60,13 +60,6 @@
             },
             "defaultValue": ""
         },
-        "SasToken": {
-            "type": "securestring",
-            "metadata": {
-                "description": "Provided Sas Token for mounting the contianers."
-            },
-            "defaultValue": ""
-        },
         "artifactsLocation": {
             "type": "string",
             "metadata": {
