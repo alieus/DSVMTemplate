@@ -138,24 +138,6 @@
             "properties": {
                 "securityRules": [
                     {
-                        "name": "AllowHttpAll",
-                        "properties": {
-                            "description": "Allow http traffic to web servers",
-                            "sourceAddressPrefix": "*",
-                            "sourcePortRange": "*",
-                            "direction": "Inbound",
-                            "access": "Allow",
-                            "priority": 100,
-                            "protocol": "Tcp",
-                            "destinationPortRange": "80",
-                            "destinationApplicationSecurityGroups": [
-                                {
-                                    "id": "[variables('asgId')]"
-                                }
-                            ]
-                        }
-                    },
-                    {
                         "name": "AllowSshAll",
                         "properties": {
                             "description": "Allow SSH traffic to web servers",
