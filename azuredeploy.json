@@ -53,6 +53,13 @@
                 "description": "Name of the storage account for the container to be mounted"
             }
         },
+        "HomeIPAddress": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "Head over to Google.com and search 'what's my ip' and insert your IPv4 here"
+            }
+        },
         "PatToken": {
             "type": "securestring",
             "metadata": {
@@ -137,6 +144,20 @@
             ],
             "properties": {
                 "securityRules": [
+                     {
+                        "name": "AllowSshtoIP",
+                        "properties": {
+                            "description": "Allow SSH traffic to certain IP addresses",
+                            "sourceAddressPrefix":"[parameters('HomeIPAddress')]",
+                            "destinationAddressPrefix": "VirtualNetwork",
+                            "sourcePortRange": "*",
+                            "direction": "Inbound",
+                            "access": "Allow",
+                            "priority": 200,
+                            "protocol": "*",
+                            "destinationPortRange": "22"
+                        }
+                    },
                     {
                         "name": "DenyAllinbound",
                         "properties": {
